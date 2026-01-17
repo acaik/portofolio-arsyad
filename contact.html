@@ -3,65 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kontak - Hubungi Saya</title>
+    <title>Kontak - DevPorto</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .form-group { margin-bottom: 1.5rem; }
-        label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
-        input, textarea { 
-            width: 100%; padding: 0.8rem; 
-            border: 1px solid #cbd5e1; border-radius: 5px;
-            font-family: inherit;
-        }
-        form { max-width: 600px; margin: 0 auto; }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body>
-  <nav>
-    <a href="index.html" class="logo">DevPorto.</a>
-    
-    <div class="menu-toggle" id="mobile-menu">
-        <span class="dot"></span>
-        <span class="dot"></span>
-        <span class="dot"></span>
-    </div>
+<body class="contact-page">
 
-    <ul class="nav-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="about.html">Tentang</a></li>
-        <li><a href="services.html">Layanan</a></li>
-        <li><a href="portfolio.html">Portofolio</a></li>
-        <li><a href="contact.html">Kontak</a></li>
-    </ul>
-</nav>
+    <a href="index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+        <span>Kembali</span>
+    </a>
 
-    <section class="container">
-        <h1 class="section-title">Mari Berdiskusi</h1>
-        <form>
-            <div class="form-group">
-                <label>Nama Lengkap</label>
-                <input type="text" placeholder="Masukkan nama Anda">
-            </div>
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" placeholder="email@contoh.com">
-            </div>
-            <div class="form-group">
-                <label>Pesan</label>
-                <textarea rows="5" placeholder="Ceritakan kebutuhan website Anda"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%; border: none;">Kirim Pesan</button>
-        </form>
+    <section class="contact-section">
+        <div class="bg-animation">
+            <div class="circle"></div>
+            <div class="circle"></div>
+        </div>
 
-        <div style="text-align: center; margin-top: 3rem;">
-            <p>Atau email langsung ke:</p>
-            <strong>halo@namaanda.com</strong>
+        <div class="container">
+            <div class="contact-card animate__animated animate__fadeIn">
+                <div class="contact-left">
+                    <h1>Mari Berkolaborasi</h1>
+                    <p class="subtitle">Siap membangun website impian Anda? Hubungi saya kapan saja untuk konsultasi gratis.</p>
+                    
+                    <div class="info-list">
+                        <div class="info-item">
+                            <div class="icon-box"><i class="fas fa-envelope"></i></div>
+                            <div class="text-box">
+                                <span>Email</span>
+                                <p>halo@namaanda.com</p>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="icon-box"><i class="fab fa-whatsapp"></i></div>
+                            <div class="text-box">
+                                <span>WhatsApp</span>
+                                <p>+62 812-3456-7890</p>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="icon-box"><i class="fas fa-map-marker-alt"></i></div>
+                            <div class="text-box">
+                                <span>Lokasi</span>
+                                <p>Indonesia (Remote)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-right">
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label>Nama Lengkap</label>
+                            <input type="text" name="nama" id="formNama" placeholder="Masukkan nama Anda" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" name="email" id="formEmail" placeholder="email@contoh.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Pesan</label>
+                            <textarea name="pesan" id="formPesan" rows="4" placeholder="Ceritakan kebutuhan website Anda" required></textarea>
+                        </div>
+                        <button type="submit" class="btn-send">Kirim Pesan <i class="fas fa-paper-plane"></i></button>
+                    </form>
+                </div>
+            </div>
         </div>
     </section>
 
-    <footer><p>&copy; 2024 DevPorto.</p></footer>
+    <script>
+    const contactForm = document.getElementById('contactForm');
+    
+    contactForm.addEventListener('submit', function(e) {
+        e.preventDefault(); // Mencegah reload halaman
 
-    <script src="script.js"></script>
+        // 1. Ambil data dari input form
+        const nama = document.getElementById('formNama').value;
+        const email = document.getElementById('formEmail').value;
+        const pesan = document.getElementById('formPesan').value;
+
+        // 2. Simpan ke LocalStorage agar Dashboard Admin bisa menampilkan pesan secara Real-Time
+        const pesanBaru = {
+            id: Date.now(),
+            nama: nama,
+            email: email,
+            isiPesan: pesan,
+            // Menambahkan waktu detail agar Admin tahu kapan pesan dikirim
+            waktu: new Date().toLocaleString('id-ID', { 
+                day: 'numeric', 
+                month: 'short', 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            }),
+            tanggal: new Date().toLocaleDateString('id-ID')
+        };
+
+        let daftarPesan = JSON.parse(localStorage.getItem('daftarPesan')) || [];
+        daftarPesan.unshift(pesanBaru); // Menyimpan pesan terbaru di urutan paling atas
+        localStorage.setItem('daftarPesan', JSON.stringify(daftarPesan));
+
+        // 3. Menampilkan notifikasi sukses menggunakan SweetAlert2
+        Swal.fire({
+            title: 'Berhasil Terkirim!',
+            text: 'Terima kasih ' + nama + ', pesan Anda sudah tercatat di sistem.',
+            icon: 'success',
+            confirmButtonText: 'OKE',
+            confirmButtonColor: '#3b82f6'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                contactForm.reset(); // Mengosongkan form setelah sukses
+            }
+        });
+
+        // 4. (Opsi Tambahan) Jika ingin tetap terkirim ke email via Formspree, 
+        // Anda bisa mengaktifkan baris fetch di bawah ini dengan KODE_UNIK Anda:
+        /*
+        fetch('https://formspree.io/f/KODE_UNIK_ANDA', {
+            method: 'POST',
+            body: new FormData(contactForm),
+            headers: { 'Accept': 'application/json' }
+        });
+        */
+    });
+    </script>
 </body>
-
 </html>
