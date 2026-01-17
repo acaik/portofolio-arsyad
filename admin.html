@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - DevPorto</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        :root { --primary: #3b82f6; --bg: #f8fafc; --text: #1e293b; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); display: none; margin: 0; }
+        .admin-page { padding: 40px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .admin-grid { display: grid; grid-template-columns: 250px 1fr; gap: 30px; margin-top: 30px; }
+        
+        /* Sidebar */
+        .sidebar { background: white; border-radius: 20px; padding: 20px; border: 1px solid #e2e8f0; height: fit-content; position: sticky; top: 20px; }
+        .sidebar-menu { list-style: none; padding: 0; margin: 0; }
+        .sidebar-menu li { padding: 15px; cursor: pointer; border-radius: 10px; transition: 0.3s; margin-bottom: 5px; display: flex; align-items: center; gap: 12px; color: #64748b; }
+        .sidebar-menu li:hover { background: #f1f5f9; color: var(--primary); }
+        .sidebar-menu li.active { background: var(--primary); color: white; }
+        
+        /* Main Content */
+        .main-content { background: white; border-radius: 24px; padding: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Statistik */
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px; }
+        .stat-card { background: #eff6ff; padding: 25px; border-radius: 20px; text-align: center; border: 1px solid #dbeafe; }
+        .stat-card h3 { font-size: 2.5rem; color: var(--primary); margin: 0; }
+
+        /* Tables & Forms */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { text-align: left; padding: 15px; border-bottom: 1px solid #f1f5f9; }
+        .form-admin { display: flex; flex-direction: column; gap: 15px; max-width: 600px; margin-bottom: 30px; }
+        input, textarea { padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; width: 100%; font-family: inherit; }
+        
+        /* Buttons */
+        .btn { padding: 10px 20px; border-radius: 10px; cursor: pointer; border: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; transition: 0.3s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-danger { background: #fee2e2; color: #ef4444; }
+        .btn-danger:hover { background: #ef4444; color: white; }
+        
+        /* Modal Balas */
+        #modalBalas {
+            display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background-color: white; margin: 10% auto; padding: 30px; border-radius: 20px;
+            width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .porto-img { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; }
+    </style>
+</head>
+<body class="admin-page">
+
+<div id="modalBalas">
+    <div class="modal-content">
+        <h2 id="modalTitle">Balas Pesan</h2>
+        <p id="modalEmailDest" style="color: var(--primary); margin-bottom: 15px;"></p>
+        <textarea id="balasIsi" rows="6" placeholder="Tulis balasan Anda di sini..."></textarea>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button class="btn btn-primary" onclick="kirimEmailSekarang()">Kirim ke Gmail User</button>
+            <button class="btn btn-danger" onclick="tutupModal()">Batal</button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1>Dashboard <span style="color: var(--primary);">Admin</span></h1>
+        <button onclick="logout()" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </header>
+
+    <div class="admin-grid">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li class="active" onclick="openTab(event, 'ringkasan')"><i class="fas fa-chart-line"></i> Ringkasan</li>
+                <li onclick="openTab(event, 'pesan')"><i class="fas fa-envelope"></i> Pesan Masuk</li>
+                <li onclick="openTab(event, 'porto')"><i class="fas fa-briefcase"></i> Kelola Porto</li>
+                <li onclick="openTab(event, 'about')"><i class="fas fa-user-edit"></i> Edit Tentang</li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div id="ringkasan" class="tab-content active">
+                <div class="stat-grid">
+                    <div class="stat-card"><h3 id="countPesan">0</h3><p>Total Pesan</p></div>
+                    <div class="stat-card"><h3 id="countPorto">0</h3><p>Proyek Porto</p></div>
+                    <div class="stat-card"><h3 id="countVisitor">0</h3><p>Pengunjung</p></div>
+                </div>
+                <h3>Selamat Datang, Admin!</h3>
+                <p style="color: #64748b;">Gunakan menu navigasi untuk mengelola konten website secara real-time.</p>
+            </div>
+
+            <div id="pesan" class="tab-content">
+                <h3>Pesan Masuk Real-Time</h3>
+                <table>
+                    <thead><tr><th>Pengirim</th><th>Isi Pesan</th><th>Aksi</th></tr></thead>
+                    <tbody id="messageTableBody"></tbody>
+                </table>
+            </div>
+
+            <div id="porto" class="tab-content">
+                <h3>Tambah Proyek Baru</h3>
+                <form id="portoForm" class="form-admin">
+                    <input type="text" id="portoTitle" placeholder="Judul Proyek" required>
+                    <input type="text" id="portoImage" placeholder="URL Gambar" required>
+                    <textarea id="portoDesc" rows="3" placeholder="Deskripsi Singkat"></textarea>
+                    <button type="submit" class="btn btn-primary">Simpan ke Website</button>
+                </form>
+                <h3 style="margin-top: 30px;">Daftar Proyek</h3>
+                <table id="portoTable">
+                    <thead><tr><th>Gambar</th><th>Judul</th><th>Aksi</th></tr></thead>
+                    <tbody id="portoListBody"></tbody>
+                </table>
+            </div>
+
+            <div id="about" class="tab-content">
+                <h3>Edit Deskripsi Tentang Saya</h3>
+                <form id="aboutForm" class="form-admin">
+                    <textarea id="aboutInput" rows="10" placeholder="Tulis bio profil Anda..." required></textarea>
+                    <button type="submit" class="btn btn-primary">Update Halaman About</button>
+                </form>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    // --- KONFIGURASI EMAILJS ---
+    (function(){
+        // Menggunakan Public Key Anda
+        emailjs.init("DgtqS3G74ietfOn4b"); 
+    })();
+
+    let targetEmail = "";
+    let targetNama = "";
+
+    // 1. KEAMANAN
+    const pass = prompt("Password:");
+    if (pass === "admin123") {
+        document.body.style.display = "block";
+        initDashboard();
+    } else { 
+        alert("Akses Ditolak!");
+        window.location.href = "index.html"; 
+    }
+
+    function initDashboard() {
+        refreshData();
+        setInterval(refreshData, 3000); 
+        document.getElementById('aboutInput').value = localStorage.getItem('aboutData') || "";
+    }
+
+    function refreshData() {
+        const pesans = JSON.parse(localStorage.getItem('daftarPesan')) || [];
+        const portos = JSON.parse(localStorage.getItem('myPortfolios')) || [];
+        const visitors = localStorage.getItem('visitorCount') || 0;
+
+        document.getElementById('countPesan').innerText = pesans.length;
+        document.getElementById('countPorto').innerText = portos.length;
+        document.getElementById('countVisitor').innerText = visitors;
+
+        const tableBody = document.getElementById('messageTableBody');
+        if (tableBody.children.length !== pesans.length) {
+            tableBody.innerHTML = pesans.map(p => `
+                <tr>
+                    <td><strong>${p.nama}</strong><br><small>${p.email}</small></td>
+                    <td>${p.isiPesan}</td>
+                    <td>
+                        <button class="btn btn-primary" onclick="bukaModal('${p.email}', '${p.nama}')"><i class="fas fa-reply"></i> Balas</button>
+                        <button class="btn btn-danger" onclick="hapusPesan(${p.id})"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        const portoBody = document.getElementById('portoListBody');
+        if (portoBody.children.length !== portos.length) {
+            portoBody.innerHTML = portos.map(item => `
+                <tr>
+                    <td><img src="${item.image}" class="porto-img" onerror="this.src='https://via.placeholder.com/60'"></td>
+                    <td>${item.title}</td>
+                    <td><button class="btn btn-danger" onclick="hapusPorto(${item.id})">Hapus</button></td>
+                </tr>
+            `).join('');
+        }
+    }
+
+    // --- LOGIKA PESAN ---
+    function bukaModal(email, nama) {
+        targetEmail = email;
+        targetNama = nama;
+        document.getElementById('modalTitle').innerText = `Balas ke ${nama}`;
+        document.getElementById('modalEmailDest').innerText = `Tujuan: ${email}`;
+        document.getElementById('modalBalas').style.display = "block";
+    }
+
+    function tutupModal() {
+        document.getElementById('modalBalas').style.display = "none";
+        document.getElementById('balasIsi').value = "";
+    }
+
+    function kirimEmailSekarang() {
+        const isiPesan = document.getElementById('balasIsi').value;
+        if(!isiPesan) return alert("Tulis pesan dulu!");
+
+        const btn = event.target;
+        btn.innerText = "Mengirim...";
+        btn.disabled = true;
+
+        // MENGGUNAKAN SERVICE ID DAN TEMPLATE ID TERBARU ANDA
+        emailjs.send("service_ahqlhut", "template_bb28xzg", {
+            nama: targetNama,
+            email_tujuan: targetEmail,
+            pesan_balasan: isiPesan
+        }).then(() => {
+            alert("Email Berhasil Terkirim ke " + targetEmail);
+            tutupModal();
+        }, (err) => {
+            alert("Gagal Kirim: " + JSON.stringify(err));
+        }).finally(() => {
+            btn.innerText = "Kirim ke Gmail User";
+            btn.disabled = false;
+        });
+    }
+
+    function hapusPesan(id) {
+        if(confirm("Hapus pesan ini?")) {
+            let list = JSON.parse(localStorage.getItem('daftarPesan')) || [];
+            list = list.filter(p => p.id !== id);
+            localStorage.setItem('daftarPesan', JSON.stringify(list));
+            refreshData();
+        }
+    }
+
+    // --- LOGIKA PORTO ---
+    document.getElementById('portoForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const list = JSON.parse(localStorage.getItem('myPortfolios')) || [];
+        list.push({
+            id: Date.now(),
+            title: document.getElementById('portoTitle').value,
+            image: document.getElementById('portoImage').value,
+            desc: document.getElementById('portoDesc').value
+        });
+        localStorage.setItem('myPortfolios', JSON.stringify(list));
+        this.reset();
+        refreshData();
+        alert("Proyek berhasil ditambahkan!");
+    });
+
+    function hapusPorto(id) {
+        if(confirm("Hapus proyek ini?")) {
+            let list = JSON.parse(localStorage.getItem('myPortfolios')) || [];
+            list = list.filter(p => p.id !== id);
+            localStorage.setItem('myPortfolios', JSON.stringify(list));
+            refreshData();
+        }
+    }
+
+    // --- LOGIKA ABOUT ---
+    document.getElementById('aboutForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        localStorage.setItem('aboutData', document.getElementById('aboutInput').value);
+        alert("Halaman About berhasil diperbarui!");
+    });
+
+    // --- NAVIGASI ---
+    function openTab(evt, tabName) {
+        document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+        document.getElementById(tabName).classList.add("active");
+        document.querySelectorAll(".sidebar-menu li").forEach(l => l.classList.remove("active"));
+        evt.currentTarget.classList.add("active");
+    }
+
+    function logout() { window.location.href = "index.html"; }
+</script>
+</body>
+</html>
