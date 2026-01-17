@@ -13,46 +13,26 @@
         .admin-page { padding: 40px 20px; }
         .container { max-width: 1200px; margin: 0 auto; }
         .admin-grid { display: grid; grid-template-columns: 250px 1fr; gap: 30px; margin-top: 30px; }
-        
-        /* Sidebar */
         .sidebar { background: white; border-radius: 20px; padding: 20px; border: 1px solid #e2e8f0; height: fit-content; position: sticky; top: 20px; }
         .sidebar-menu { list-style: none; padding: 0; margin: 0; }
         .sidebar-menu li { padding: 15px; cursor: pointer; border-radius: 10px; transition: 0.3s; margin-bottom: 5px; display: flex; align-items: center; gap: 12px; color: #64748b; }
-        .sidebar-menu li:hover { background: #f1f5f9; color: var(--primary); }
         .sidebar-menu li.active { background: var(--primary); color: white; }
-        
-        /* Main Content */
         .main-content { background: white; border-radius: 24px; padding: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Statistik */
         .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px; }
         .stat-card { background: #eff6ff; padding: 25px; border-radius: 20px; text-align: center; border: 1px solid #dbeafe; }
         .stat-card h3 { font-size: 2.5rem; color: var(--primary); margin: 0; }
-
-        /* Tables & Forms */
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { text-align: left; padding: 15px; border-bottom: 1px solid #f1f5f9; }
         .form-admin { display: flex; flex-direction: column; gap: 15px; max-width: 600px; margin-bottom: 30px; }
         input, textarea { padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; width: 100%; font-family: inherit; }
-        
-        /* Buttons */
         .btn { padding: 10px 20px; border-radius: 10px; cursor: pointer; border: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; transition: 0.3s; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-danger { background: #fee2e2; color: #ef4444; }
-        .btn-danger:hover { background: #ef4444; color: white; }
-        
-        /* Modal Balas */
-        #modalBalas {
-            display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
-        }
-        .modal-content {
-            background-color: white; margin: 10% auto; padding: 30px; border-radius: 20px;
-            width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
+        #modalBalas { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(5px); }
+        .modal-content { background-color: white; margin: 10% auto; padding: 30px; border-radius: 20px; width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .porto-img { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; }
     </style>
 </head>
@@ -93,8 +73,8 @@
                     <div class="stat-card"><h3 id="countPorto">0</h3><p>Proyek Porto</p></div>
                     <div class="stat-card"><h3 id="countVisitor">0</h3><p>Pengunjung</p></div>
                 </div>
-                <h3>Selamat Datang, Admin!</h3>
-                <p style="color: #64748b;">Gunakan menu navigasi untuk mengelola konten website secara real-time.</p>
+                <h3>Selamat Datang, Arsyad!</h3>
+                <p style="color: #64748b;">Gunakan dashboard ini untuk mengelola portofolio Anda secara real-time.</p>
             </div>
 
             <div id="pesan" class="tab-content">
@@ -114,7 +94,7 @@
                     <button type="submit" class="btn btn-primary">Simpan ke Website</button>
                 </form>
                 <h3 style="margin-top: 30px;">Daftar Proyek</h3>
-                <table id="portoTable">
+                <table>
                     <thead><tr><th>Gambar</th><th>Judul</th><th>Aksi</th></tr></thead>
                     <tbody id="portoListBody"></tbody>
                 </table>
@@ -123,7 +103,7 @@
             <div id="about" class="tab-content">
                 <h3>Edit Deskripsi Tentang Saya</h3>
                 <form id="aboutForm" class="form-admin">
-                    <textarea id="aboutInput" rows="10" placeholder="Tulis bio profil Anda..." required></textarea>
+                    <textarea id="aboutInput" rows="10" placeholder="Tulis bio profil baru..." required></textarea>
                     <button type="submit" class="btn btn-primary">Update Halaman About</button>
                 </form>
             </div>
@@ -132,16 +112,14 @@
 </div>
 
 <script>
-    // --- KONFIGURASI EMAILJS ---
     (function(){
-        // Menggunakan Public Key Anda
+        // Menggunakan Public Key Anda yang benar
         emailjs.init("DgtqS3G74ietfOn4b"); 
     })();
 
     let targetEmail = "";
     let targetNama = "";
 
-    // 1. KEAMANAN
     const pass = prompt("Password:");
     if (pass === "admin123") {
         document.body.style.display = "block";
@@ -153,7 +131,7 @@
 
     function initDashboard() {
         refreshData();
-        setInterval(refreshData, 3000); 
+        setInterval(refreshData, 3000);
         document.getElementById('aboutInput').value = localStorage.getItem('aboutData') || "";
     }
 
@@ -192,7 +170,6 @@
         }
     }
 
-    // --- LOGIKA PESAN ---
     function bukaModal(email, nama) {
         targetEmail = email;
         targetNama = nama;
@@ -214,7 +191,7 @@
         btn.innerText = "Mengirim...";
         btn.disabled = true;
 
-        // MENGGUNAKAN SERVICE ID DAN TEMPLATE ID TERBARU ANDA
+        // Menggunakan Service ID dan Template ID Anda yang sudah valid
         emailjs.send("service_ahqlhut", "template_bb28xzg", {
             nama: targetNama,
             email_tujuan: targetEmail,
@@ -239,7 +216,6 @@
         }
     }
 
-    // --- LOGIKA PORTO ---
     document.getElementById('portoForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const list = JSON.parse(localStorage.getItem('myPortfolios')) || [];
@@ -252,7 +228,7 @@
         localStorage.setItem('myPortfolios', JSON.stringify(list));
         this.reset();
         refreshData();
-        alert("Proyek berhasil ditambahkan!");
+        alert("Proyek ditambahkan!");
     });
 
     function hapusPorto(id) {
@@ -264,14 +240,12 @@
         }
     }
 
-    // --- LOGIKA ABOUT ---
     document.getElementById('aboutForm').addEventListener('submit', function(e) {
         e.preventDefault();
         localStorage.setItem('aboutData', document.getElementById('aboutInput').value);
-        alert("Halaman About berhasil diperbarui!");
+        alert("Halaman About diperbarui!");
     });
 
-    // --- NAVIGASI ---
     function openTab(evt, tabName) {
         document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
         document.getElementById(tabName).classList.add("active");
