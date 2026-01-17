@@ -10,8 +10,12 @@
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
     <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 </head>
 <body>
+
+    <div class="page-transition-overlay"></div>
 
     <header class="hero">
         <div class="container hero-content">
@@ -55,9 +59,10 @@
         </div>
     </section>
 
-    <footer>
-        <p>&copy; 2024 DevPorto. All rights reserved.</p>
-    </footer>
+  <footer style="text-align: center; padding: 20px; opacity: 0.5;">
+    <p>&copy; 2024 DevPorto.</p>
+    <a href="admin.html" style="color: transparent; font-size: 10px; text-decoration: none;">.</a>
+</footer>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
@@ -67,6 +72,30 @@
     </script>
     
     <script src="script.js"></script>
-</body>
+    <script src="transition.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. Logika Hitung Pengunjung Otomatis
+        let visitorCount = parseInt(localStorage.getItem('visitorCount')) || 0;
+        visitorCount++;
+        localStorage.setItem('visitorCount', visitorCount);
 
+        // 2. Menampilkan Portofolio dari Admin (Jika ada kontainer portofolio)
+        const container = document.getElementById('portfolioContainer');
+        if (container) {
+            const savedPortos = JSON.parse(localStorage.getItem('myPortfolios')) || [];
+            savedPortos.forEach(porto => {
+                container.innerHTML += `
+                    <div class="portfolio-card">
+                        <img src="${porto.image}" alt="${porto.title}">
+                        <div class="card-body">
+                            <h3>${porto.title}</h3>
+                            <p>${porto.desc}</p>
+                        </div>
+                    </div>`;
+            });
+        }
+    });
+</script>
+</body>
 </html>
