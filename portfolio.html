@@ -5,50 +5,89 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portofolio - Proyek Demo</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
-   <nav>
-    <a href="index.html" class="logo">DevPorto.</a>
-    
-    <div class="menu-toggle" id="mobile-menu">
-        <span class="dot"></span>
-        <span class="dot"></span>
-        <span class="dot"></span>
-    </div>
+<body class="page-bg-gradient"> <nav>
+        <a href="index.html" class="logo">DevPorto.</a>
+        
+        <div class="menu-toggle" id="mobile-menu">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
 
-    <ul class="nav-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="about.html">Tentang</a></li>
-        <li><a href="services.html">Layanan</a></li>
-        <li><a href="portfolio.html">Portofolio</a></li>
-        <li><a href="contact.html">Kontak</a></li>
-    </ul>
-</nav>
+        <ul class="nav-links" id="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">Tentang</a></li>
+            <li><a href="services.html">Layanan</a></li>
+            <li><a href="portfolio.html" class="active">Portofolio</a></li>
+            <li><a href="contact.html">Kontak</a></li>
+        </ul>
+    </nav>
 
     <section class="container">
-        <h1 class="section-title">Portofolio & Proyek Demo</h1>
-        <div class="grid">
-            <div class="card" style="padding: 0; overflow: hidden;">
-                <div style="height: 200px; background: #ddd;"></div> <div style="padding: 1.5rem;">
-                    <span style="color: var(--primary-color); font-size: 0.8rem; font-weight: bold;">PERSONAL PROJECT</span>
-                    <h3 style="margin-top: 0.5rem;">E-Commerce Coffee Shop</h3>
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Landing page responsif menggunakan WordPress dan WooCommerce.</p>
-                    <a href="#" style="color: var(--primary-color); text-decoration: none; font-weight: bold;">Lihat Detail →</a>
-                </div>
-            </div>
-
-            <div class="card" style="padding: 0; overflow: hidden;">
-                <div style="height: 200px; background: #ccc;"></div> <div style="padding: 1.5rem;">
-                    <span style="color: var(--primary-color); font-size: 0.8rem; font-weight: bold;">PROYEK DEMO</span>
-                    <h3 style="margin-top: 0.5rem;">Startup Saas Profile</h3>
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Website satu halaman dengan animasi halus menggunakan HTML/CSS murni.</p>
-                    <a href="#" style="color: var(--primary-color); text-decoration: none; font-weight: bold;">Lihat Detail →</a>
-                </div>
-            </div>
+        <h1 class="section-title">Portofolio & <span style="color: var(--primary-color);">Proyek Terbaru</span></h1>
+        
+        <div class="grid" id="portfolio-list">
+            <p id="loading-text">Memuat proyek...</p>
         </div>
     </section>
 
-    <footer><p>&copy; 2024 DevPorto.</p></footer>
-    <script src="script.js"></script>
+    <footer><p>&copy; 2026 DevPorto.</p></footer>
+
+    <script>
+        // 1. Fungsi Navigasi Mobile (Burger Menu)
+        const menuToggle = document.getElementById('mobile-menu');
+        const navLinks = document.getElementById('nav-links');
+        
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        // 2. Fungsi Load Portfolio dari LocalStorage (Dashboard Admin)
+        function loadPortfolioData() {
+            const portfolioGrid = document.getElementById('portfolio-list');
+            
+            // Ambil data 'myPortfolios' yang disimpan oleh admin.html
+            const dataPorto = JSON.parse(localStorage.getItem('myPortfolios')) || [];
+
+            if (dataPorto.length === 0) {
+                portfolioGrid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 50px;">
+                        <i class="fas fa-folder-open" style="font-size: 3rem; color: #ddd; margin-bottom: 15px;"></i>
+                        <p style="color: var(--text-muted);">Belum ada proyek yang dipublikasikan oleh admin.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Render proyek ke dalam grid
+            portfolioGrid.innerHTML = dataPorto.map(item => `
+                <div class="card" style="padding: 0; overflow: hidden; border-radius: 20px; border: 1px solid #e2e8f0;">
+                    <div style="height: 220px; background: #f1f5f9; overflow: hidden;">
+                        <img src="${item.image}" alt="${item.title}" 
+                             style="width: 100%; height: 100%; object-fit: cover; transition: 0.5s;"
+                             onerror="this.src='https://via.placeholder.com/400x250?text=Gambar+Proyek'">
+                    </div> 
+                    <div style="padding: 1.5rem;">
+                        <span style="color: var(--primary-color); font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">
+                            Latest Project
+                        </span>
+                        <h3 style="margin-top: 0.5rem; font-size: 1.25rem;">${item.title}</h3>
+                        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.2rem; line-height: 1.5;">
+                            ${item.desc || 'Deskripsi proyek ini belum ditambahkan oleh admin.'}
+                        </p>
+                        <a href="#" style="color: var(--primary-color); text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;">
+                            Lihat Detail <i class="fas fa-arrow-right" style="font-size: 0.8rem;"></i>
+                        </a>
+                    </div>
+                </div>
+            `).reverse().join(''); // .reverse() agar proyek terbaru muncul di paling atas
+        }
+
+        // Jalankan fungsi saat halaman selesai dimuat
+        document.addEventListener('DOMContentLoaded', loadPortfolioData);
+    </script>
+
 </body>
 </html>
